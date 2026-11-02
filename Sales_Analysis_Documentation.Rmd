@@ -1,0 +1,67 @@
+---
+title: "Synthetic Retail Sales Analysis: R Script Documentation"
+author: "BDA400 Student"
+date: "2026-10-26"
+output: html_document
+---
+
+> **AI Assistance Declaration:** I used ChatGPT (OpenAI GPT-6, October 26, 2026) for documentation structure, drafting, formatting suggestions, and example R code scaffolding. Prompts are recorded in `AI_Prompts_Appendix.md`. I must verify the outputs using GitHub Markdown preview, an R Markdown knit, independent checks of R results, and manual spot-checks before submission. All final calculations must be run and checked by me. I am responsible for the accuracy and originality of this work.
+
+# Purpose
+Document the `R/sales_analysis.R` script and demonstrate transparent, reproducible analysis using synthetic retail orders.
+
+## Inputs
+The script generates 120 synthetic records internally. Each has an order ID, month, category, units, unit price, and calculated revenue. There are no external datasets or personal records.
+
+## Process
+1. Fix the random seed for reproducibility.
+2. Generate sample order quantities and prices.
+3. Compute revenue as units multiplied by unit price.
+4. Aggregate revenue by month and category.
+5. Check summary totals against raw totals.
+6. Export CSV files and a PNG chart.
+
+## Run the analysis
+The setup chunk sets the working directory to the repository root when the report is knitted from `docs/`.
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r run-analysis, echo=TRUE, message=FALSE, warning=FALSE}
+source("R/sales_analysis.R")
+```
+
+## Preview the first records
+```{r preview-orders}
+head(orders)
+```
+
+## Summary tables
+```{r summaries}
+knitr::kable(monthly, caption = "Monthly synthetic revenue")
+knitr::kable(category_totals, caption = "Revenue by category")
+```
+
+## Chart
+```{r monthly-chart, fig.cap="Synthetic monthly revenue", echo=TRUE}
+barplot(monthly$revenue, names.arg = as.character(monthly$month),
+        col = "steelblue", main = "Monthly Revenue (Synthetic Data)",
+        xlab = "Month", ylab = "Revenue (CAD)")
+```
+
+## Verification
+```{r checks}
+stopifnot(nrow(orders) == 120)
+stopifnot(sum(monthly$revenue) == sum(orders$revenue))
+stopifnot(sum(category_totals$revenue) == sum(orders$revenue))
+# Independent check by summing the order-level values directly:
+manual_formula_check <- sum(orders$units * orders$unit_price)
+stopifnot(manual_formula_check == sum(orders$revenue))
+```
+
+## Outputs
+The script writes `monthly_revenue.csv`, `category_revenue.csv`, and `monthly_revenue.png` to `outputs/`. R Markdown also renders this explanatory report to HTML.
+
+## Limitations and ethical considerations
+The synthetic records are illustrative only. Results must not be presented as actual sales. AI assistance was used for documentation and code scaffolding; the student is responsible for independently running, checking, and validating all results.
